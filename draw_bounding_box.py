@@ -2,15 +2,14 @@ import cv2
 import csv
 import os
 from inference_sdk import InferenceHTTPClient, InferenceConfiguration
+from config import MODEL_ID
 
-# Configuración del cliente de inferencia con umbral de confianza
-custom_configuration = InferenceConfiguration(confidence_threshold=0.75)
-
-
+# Configuración inicial del cliente de inferencia
 CLIENT = InferenceHTTPClient(
     api_url="https://detect.roboflow.com",
     api_key="O9O8mwpy2WXTtXuYDXOm"
 )
+CLIENT.configure(InferenceConfiguration(confidence_threshold=0.75))
 
 # Directorios de entrada y salida
 input_dir = 'imagenes_satelitales_google_maps'
@@ -21,26 +20,16 @@ output_csv = 'detecciones.csv'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-# Crear el archivo CSV y escribir el encabezado
-with open(output_csv, mode='w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerow([
-        "Imagen", "Latitud Mínima", "Longitud Mínima", "Latitud Máxima", "Longitud Máxima", 
-        "x", "y", "Ancho", "Alto", "Confianza", "Clase"
-    ])
-
-# Función para dibujar los cuadros delimitadores y guardar la información
-def procesar_imagen(nombre_imagen, modelo_id="710robotrain/3"):
+# Función para procesar una imagen y guardar resultados
+def procesar_imagen(image_path, modelo_id):
     try:
+        nombre_imagen = os.path.basename(image_path)
         # Cargar la imagen
-        image_path = os.path.join(input_dir, nombre_imagen)
         image = cv2.imread(image_path)
         if image is None:
-            print(f"No se pudo cargar la imagen: {nombre_imagen}")
-            return
+            return f"No se pudo cargar la imagen: {nombre_imagen}"
 
-        # Realizar la inferencia en la imagen
-        CLIENT.configure(custom_configuration)
+        # Realizar la inferencia
         result = CLIENT.infer(image_path, model_id=modelo_id)
 
         # Extraer las coordenadas del nombre de la imagen
@@ -77,12 +66,24 @@ def procesar_imagen(nombre_imagen, modelo_id="710robotrain/3"):
         # Guardar la imagen con los cuadros delimitadores
         output_path = os.path.join(output_dir, nombre_imagen)
         cv2.imwrite(output_path, image)
-        print(f"Imagen procesada y guardada en: {output_path}")
+        return f"Imagen procesada y guardada en: {output_path}"
 
     except Exception as e:
-        print(f"Error procesando la imagen {nombre_imagen}: {str(e)}")
+        return f"Error procesando la imagen {image_path}: {str(e)}"
 
-# Procesar todas las imágenes en el directorio de entrada
-for imagen in os.listdir(input_dir):
-    if imagen.endswith(".png"):
-        procesar_imagen(imagen)
+# Función para procesar todas las imágenes en el directorio de entrada
+def procesar_todas_imagenes(input_dir, modelo_id):
+    # Crear el csv aqui
+    with open(output_csv, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([
+            "Imagen", "Latitud Mínima", "Longitud Mínima", "Latitud Máxima", "Longitud Máxima",
+            "x", "y", "Ancho", "Alto", "Confianza", "Clase"
+        ])
+    mensajes = []
+    for imagen in os.listdir(input_dir):
+        if imagen.endswith(".png"):
+            image_path = os.path.join(input_dir, imagen)
+            mensaje = procesar_imagen(image_path, modelo_id)
+            mensajes.append(mensaje)
+    return mensajes

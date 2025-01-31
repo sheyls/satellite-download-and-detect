@@ -3,9 +3,11 @@ import os
 import time
 import math
 
+from config import KEY, OUTPUT_DIR, LAT_MIN, LON_MIN, LAT_MAX, LON_MAX
+
 # Configuración inicial
-API_KEY = 'key'
-output_dir = 'imagenes_satelitales_google_maps'
+API_KEY = KEY
+output_dir = OUTPUT_DIR
 
 # Crea el directorio si no existe
 if not os.path.exists(output_dir):
@@ -77,11 +79,5 @@ def km_a_grados(km, latitud):
     grados_lon = km / (111 * abs(math.cos(math.radians(latitud))))  # Ajuste según la latitud
     return grados_lat, grados_lon
 
-# Define los límites de la zona que quieres cubrir (por ejemplo, parte de La Habana)
-lat_min = 23.1000  # Latitud mínima (sur)
-lon_min = -82.4100  # Longitud mínima (oeste)
-lat_max = 23.1600  # Latitud máxima (norte)
-lon_max = -82.3400  # Longitud máxima (este)
-
-# Ejecutar la descarga con nivel de zoom 16
-descargar_imagenes_en_zona(lat_min, lon_min, lat_max, lon_max, zoom=16, tamaño_imagen_pixeles=640)
+# Ejecutar la descarga
+#descargar_imagenes_en_zona(LAT_MIN, LON_MIN, LAT_MAX, LON_MAX, zoom=16, tamaño_imagen_pixeles=640)
