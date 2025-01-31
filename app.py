@@ -5,7 +5,14 @@ from folium.plugins import Draw
 from download_img import descargar_imagenes_en_zona
 from draw_bounding_box import procesar_todas_imagenes
 import os
-from config import OUTPUT_DIR
+from config import OUTPUT_DIR, INPUT_DIR, MODEL_ID
+
+# Configuración inicial
+if not os.path.exists(INPUT_DIR):
+    os.makedirs(INPUT_DIR)
+
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
 
 # Configuración de la aplicación
 st.title("Aplicación de Descarga de Imágenes Satelitales")
@@ -17,6 +24,7 @@ st.sidebar.header("Controles de la Aplicación")
 # Mapa interactivo
 m = folium.Map(location=[23.1200, -82.3830], zoom_start=12)
 output_dir = OUTPUT_DIR
+input_dir = INPUT_DIR
 
 # Añadir la herramienta de dibujo limitada a rectángulos y borrar
 draw = Draw(
@@ -59,7 +67,7 @@ if map_data and map_data.get("last_active_drawing"):
         st.sidebar.write(f"**Longitud máxima:** {lon_max:.4f}")
 
         # Slider para el nivel de zoom
-        zoom = st.sidebar.slider("Selecciona el nivel de zoom (más alto = más detalle):", 12, 18, 16)
+        zoom = st.sidebar.slider("Selecciona el nivel de zoom (más alto = más detalle):", 12, 20, 16)
 
         # Botón para descargar imágenes
         if st.sidebar.button("Descargar imágenes"):
@@ -75,13 +83,13 @@ if map_data and map_data.get("last_active_drawing"):
                 status_text.success("Descarga completada.")  # Actualizar cuando termine
 
         # Verificar si hay imágenes disponibles para procesar
-        if os.listdir(output_dir):
+        if os.listdir(input_dir):
             if st.sidebar.button("Procesar imágenes"):
                 status_text = st.sidebar.empty()  # Crear un contenedor vacío para actualizar el texto
                 status_text.info("Procesando imágenes, por favor espere...")  # Mostrar el mensaje inicial
 
                 # Ejecutar el procesamiento y actualizar el texto
-                procesar_todas_imagenes(output_dir, "710robotrain/3")
+                procesar_todas_imagenes(MODEL_ID)
 
                 status_text.success("Procesamiento completado.")  # Actualizar cuando termine
         else:

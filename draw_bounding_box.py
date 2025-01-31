@@ -1,24 +1,8 @@
 import cv2
 import csv
 import os
-from inference_sdk import InferenceHTTPClient, InferenceConfiguration
-from config import MODEL_ID
-
-# Configuración inicial del cliente de inferencia
-CLIENT = InferenceHTTPClient(
-    api_url="https://detect.roboflow.com",
-    api_key="O9O8mwpy2WXTtXuYDXOm"
-)
-CLIENT.configure(InferenceConfiguration(confidence_threshold=0.75))
-
-# Directorios de entrada y salida
-input_dir = 'imagenes_satelitales_google_maps'
-output_dir = 'imagenes_con_circulos'
-output_csv = 'detecciones.csv'
-
-# Crear el directorio de salida si no existe
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+from inference_config import CLIENT  # Cliente de inferencia configurado
+from config import MODEL_ID, INPUT_DIR, OUTPUT_DIR, OUTPUT_CSV
 
 # Función para procesar una imagen y guardar resultados
 def procesar_imagen(image_path, modelo_id):
@@ -57,14 +41,14 @@ def procesar_imagen(image_path, modelo_id):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
                 # Guardar la información en el archivo CSV
-                with open(output_csv, mode='a', newline='') as file:
+                with open(OUTPUT_CSV, mode='a', newline='') as file:
                     writer = csv.writer(file)
                     writer.writerow([
                         nombre_imagen, lat_min, lon_min, lat_max, lon_max, x, y, ancho, alto, confianza, clase
                     ])
 
         # Guardar la imagen con los cuadros delimitadores
-        output_path = os.path.join(output_dir, nombre_imagen)
+        output_path = os.path.join(OUTPUT_DIR, nombre_imagen)
         cv2.imwrite(output_path, image)
         return f"Imagen procesada y guardada en: {output_path}"
 
@@ -72,18 +56,19 @@ def procesar_imagen(image_path, modelo_id):
         return f"Error procesando la imagen {image_path}: {str(e)}"
 
 # Función para procesar todas las imágenes en el directorio de entrada
-def procesar_todas_imagenes(input_dir, modelo_id):
-    # Crear el csv aqui
-    with open(output_csv, mode='w', newline='') as file:
+def procesar_todas_imagenes(modelo_id):
+    # Crear el archivo CSV con encabezado
+    with open(OUTPUT_CSV, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([
             "Imagen", "Latitud Mínima", "Longitud Mínima", "Latitud Máxima", "Longitud Máxima",
             "x", "y", "Ancho", "Alto", "Confianza", "Clase"
         ])
+
     mensajes = []
-    for imagen in os.listdir(input_dir):
+    for imagen in os.listdir(INPUT_DIR):
         if imagen.endswith(".png"):
-            image_path = os.path.join(input_dir, imagen)
+            image_path = os.path.join(INPUT_DIR , imagen)
             mensaje = procesar_imagen(image_path, modelo_id)
             mensajes.append(mensaje)
     return mensajes

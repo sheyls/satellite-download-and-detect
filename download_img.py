@@ -1,17 +1,12 @@
 import requests
-import os
 import time
 import math
 
-from config import KEY, OUTPUT_DIR, LAT_MIN, LON_MIN, LAT_MAX, LON_MAX
+from config import KEY, INPUT_DIR
 
 # Configuración inicial
 API_KEY = KEY
-output_dir = OUTPUT_DIR
-
-# Crea el directorio si no existe
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+output_dir = INPUT_DIR
 
 # Función para calcular el área cubierta por una imagen en km, basado en el nivel de zoom
 def calcular_paso_adecuado(zoom, tamaño_imagen_pixeles, latitud_centro):
@@ -76,7 +71,7 @@ def descargar_imagenes_en_zona(lat_min, lon_min, lat_max, lon_max, zoom=16, tama
 # Función para convertir kilómetros a grados (aproximación)
 def km_a_grados(km, latitud):
     grados_lat = km / 111  # 1° de latitud = ~111 km
-    grados_lon = km / (111 * abs(math.cos(math.radians(latitud))))  # Ajuste según la latitud
+    grados_lon = km / (111 * abs(math.cos(math.radians(latitud)))) 
     return grados_lat, grados_lon
 
 # Ejecutar la descarga
