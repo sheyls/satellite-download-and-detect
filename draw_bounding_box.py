@@ -2,7 +2,7 @@ import cv2
 import csv
 import os
 from inference_config import CLIENT
-from config import MODEL_SELECTED, INPUT_DIR, OUTPUT_DIR, OUTPUT_CSV
+from config import MODEL_SELECTED, INPUT_DIR, OUTPUT_DIR, OUTPUT_CSV, IMAGE_WIDTH, IMAGE_HEIGHT
 
 # Función para procesar una imagen y guardar resultados
 def procesar_imagen(image_path, modelo_id):
@@ -40,11 +40,14 @@ def procesar_imagen(image_path, modelo_id):
                 cv2.putText(image, texto, (esquina_sup_izq[0], esquina_sup_izq[1] - 5),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
+                # Calcular la latitud y longitud del objeto detectado
+                lat_obj, lon_obj = calcular_coordenadas_objeto(lat_min, lon_min, lat_max, lon_max, x, y)
+
                 # Guardar la información en el archivo CSV
                 with open(OUTPUT_CSV, mode='a', newline='') as file:
                     writer = csv.writer(file)
                     writer.writerow([
-                        nombre_imagen, lat_min, lon_min, lat_max, lon_max, x, y, ancho, alto, confianza, clase
+                        nombre_imagen, lat_min, lon_min, lat_max, lon_max, x, y, ancho, alto, confianza, clase, lat_obj, lon_obj
                     ])
 
         # Guardar la imagen con los cuadros delimitadores
@@ -62,7 +65,7 @@ def procesar_todas_imagenes(modelo_id):
         writer = csv.writer(file)
         writer.writerow([
             "Imagen", "Latitud Mínima", "Longitud Mínima", "Latitud Máxima", "Longitud Máxima",
-            "x", "y", "Ancho", "Alto", "Confianza", "Clase"
+            "x", "y", "Ancho", "Alto", "Confianza", "Clase", "Latitud Objeto", "Longitud Objeto"
         ])
 
     mensajes = []
@@ -72,3 +75,10 @@ def procesar_todas_imagenes(modelo_id):
             mensaje = procesar_imagen(image_path, modelo_id)
             mensajes.append(mensaje)
     return mensajes
+
+# Función para calcular la posición geográfica del objeto detectado
+def calcular_coordenadas_objeto(lat_min, lon_min, lat_max, lon_max, x, y):
+    # Interpolación lineal para calcular la latitud y longitud del objeto
+    lat_obj = lat_min + (y / IMAGE_HEIGHT) * (lat_max - lat_min)
+    lon_obj = lon_min + (x / IMAGE_WIDTH) * (lon_max - lon_min)
+    return lat_obj, lon_obj

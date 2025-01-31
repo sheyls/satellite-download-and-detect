@@ -1,6 +1,9 @@
 KEY = "YOUR_API_KEY"
 OUTPUT_DIR = 'imagenes_satelitales_google_maps'
 
+IMAGE_WIDTH = 640
+IMAGE_HEIGHT = 640
+
 LAT_MIN = 23.1000 
 LON_MIN = -82.4100  
 LAT_MAX = 23.1600  
