@@ -12,8 +12,12 @@ INPUT_DIR = f'{BASE_DIR}/imagenes_satelitales_google_maps'
 OUTPUT_DIR = f'{BASE_DIR}/imagenes_con_circulos'
 OUTPUT_CSV = f'{BASE_DIR}/detecciones.csv'
 
-##MODEL_ID = "710robotrain/3"
+# IDs de modelos de detección disponibles
+MODEL_IDS = {
+    "Robot Train": "710robotrain/3",
+    "Círculos Geométricos": "circulos-gcomj/31",
+    "Google Earth Tomb (Automático)": "googleearthtomb/12"
+}
 
-#MODEL_ID = "circulos-gcomj/31"
-
-MODEL_ID = "googleearthtomb/12"
+# Modelo predeterminado (último)
+MODEL_SELECTED = "googleearthtomb/12"

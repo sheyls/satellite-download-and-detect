@@ -2,7 +2,7 @@ import cv2
 import csv
 import os
 from inference_config import CLIENT  # Cliente de inferencia configurado
-from config import MODEL_ID, INPUT_DIR, OUTPUT_DIR, OUTPUT_CSV
+from config import MODEL_SELECTED, INPUT_DIR, OUTPUT_DIR, OUTPUT_CSV
 
 # Función para procesar una imagen y guardar resultados
 def procesar_imagen(image_path, modelo_id):
@@ -14,7 +14,7 @@ def procesar_imagen(image_path, modelo_id):
             return f"No se pudo cargar la imagen: {nombre_imagen}"
 
         # Realizar la inferencia
-        result = CLIENT.infer(image_path, model_id=modelo_id)
+        result = CLIENT.infer(image_path, model_id=MODEL_SELECTED)
 
         # Extraer las coordenadas del nombre de la imagen
         coordenadas = nombre_imagen.replace(".png", "").replace("imagen_", "").split("_")

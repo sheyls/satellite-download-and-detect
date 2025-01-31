@@ -5,7 +5,7 @@ from folium.plugins import Draw
 from download_img import descargar_imagenes_en_zona
 from draw_bounding_box import procesar_todas_imagenes
 import os
-from config import OUTPUT_DIR, INPUT_DIR, MODEL_ID
+from config import OUTPUT_DIR, INPUT_DIR, MODEL_IDS, MODEL_SELECTED
 
 # Configuración inicial
 if not os.path.exists(INPUT_DIR):
@@ -47,6 +47,15 @@ map_data = st_folium(m, width=800, height=500)
 st.sidebar.write("### Configuración de la API de Google Maps")
 api_key = st.sidebar.text_input("API Key:", "YOUR_API_KEY")
 
+# --- Selección del modelo ---
+st.sidebar.write("### Selección del modelo de detección")
+modelo_seleccionado = st.sidebar.selectbox(
+    "Selecciona el modelo para detectar objetos:",
+    options=list(MODEL_IDS.keys()),
+    index=list(MODEL_IDS.keys()).index("Google Earth Tomb (Automático)")  # Por defecto el último
+)
+MODEL_SELECTED = MODEL_IDS[modelo_seleccionado]
+
 # --- Captura de coordenadas desde el mapa ---
 if map_data and map_data.get("last_active_drawing"):
     drawing = map_data["last_active_drawing"]
@@ -78,7 +87,7 @@ if map_data and map_data.get("last_active_drawing"):
                 status_text.info("Descargando, por favor espere...")  # Mostrar el mensaje inicial
 
                 # Ejecutar la descarga y actualizar el texto
-                descargar_imagenes_en_zona(lat_min, lon_min, lat_max, lon_max, zoom=zoom)
+                descargar_imagenes_en_zona(lat_min, lon_min, lat_max, lon_max, zoom=zoom, output_dir=INPUT_DIR, api_key=api_key)
                 
                 status_text.success("Descarga completada.")  # Actualizar cuando termine
 
@@ -89,7 +98,7 @@ if map_data and map_data.get("last_active_drawing"):
                 status_text.info("Procesando imágenes, por favor espere...")  # Mostrar el mensaje inicial
 
                 # Ejecutar el procesamiento y actualizar el texto
-                procesar_todas_imagenes(MODEL_ID)
+                procesar_todas_imagenes(MODEL_SELECTED)
 
                 status_text.success("Procesamiento completado.")  # Actualizar cuando termine
         else:

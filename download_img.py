@@ -16,8 +16,8 @@ def calcular_paso_adecuado(zoom, tamaño_imagen_pixeles, latitud_centro):
     return area_km
 
 # Función para descargar imágenes satelitales
-def descargar_imagen_satelital(lat_min, lon_min, lat_max, lon_max, centro_lat, centro_lon, zoom=16, size="640x640"):
-    url = f"https://maps.googleapis.com/maps/api/staticmap?center={centro_lat},{centro_lon}&zoom={zoom}&size={size}&maptype=satellite&key={API_KEY}"
+def descargar_imagen_satelital(lat_min, lon_min, lat_max, lon_max, centro_lat, centro_lon, zoom=16, size="640x640", output_dir="", api_key=None):
+    url = f"https://maps.googleapis.com/maps/api/staticmap?center={centro_lat},{centro_lon}&zoom={zoom}&size={size}&maptype=satellite&key={api_key}"
     try:
         response = requests.get(url)
 
@@ -34,7 +34,7 @@ def descargar_imagen_satelital(lat_min, lon_min, lat_max, lon_max, centro_lat, c
         print(f"Error descargando la imagen ({centro_lat}, {centro_lon}): {str(e)}")
 
 # Función principal para calcular la cuadrícula y descargar las imágenes sin superposición
-def descargar_imagenes_en_zona(lat_min, lon_min, lat_max, lon_max, zoom=16, tamaño_imagen_pixeles=640):
+def descargar_imagenes_en_zona(lat_min, lon_min, lat_max, lon_max, zoom=16, tamaño_imagen_pixeles=640, output_dir="", api_key=None):
     # Calcular el paso en km basado en el nivel de zoom y el tamaño de la imagen
     paso_km = calcular_paso_adecuado(zoom, tamaño_imagen_pixeles, (lat_min + lat_max) / 2)
 
@@ -63,7 +63,7 @@ def descargar_imagenes_en_zona(lat_min, lon_min, lat_max, lon_max, zoom=16, tama
             print(f"Descargando imagen para: ({centro_lat}, {centro_lon}) con cuadro delimitador: ({cuadro_lat_min}, {cuadro_lon_min}, {cuadro_lat_max}, {cuadro_lon_max})")
 
             # Descargar la imagen satelital
-            descargar_imagen_satelital(cuadro_lat_min, cuadro_lon_min, cuadro_lat_max, cuadro_lon_max, centro_lat, centro_lon, zoom)
+            descargar_imagen_satelital(cuadro_lat_min, cuadro_lon_min, cuadro_lat_max, cuadro_lon_max, centro_lat, centro_lon, zoom,"640x640", output_dir ,api_key)
 
             # Pausa para evitar exceder el límite de solicitudes por segundo
             time.sleep(1)
