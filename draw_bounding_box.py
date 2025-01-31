@@ -1,7 +1,7 @@
 import cv2
 import csv
 import os
-from inference_config import CLIENT  # Cliente de inferencia configurado
+from inference_config import CLIENT
 from config import MODEL_SELECTED, INPUT_DIR, OUTPUT_DIR, OUTPUT_CSV
 
 # Función para procesar una imagen y guardar resultados

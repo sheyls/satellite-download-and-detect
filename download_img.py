@@ -4,10 +4,6 @@ import math
 
 from config import KEY, INPUT_DIR
 
-# Configuración inicial
-API_KEY = KEY
-output_dir = INPUT_DIR
-
 # Función para calcular el área cubierta por una imagen en km, basado en el nivel de zoom
 def calcular_paso_adecuado(zoom, tamaño_imagen_pixeles, latitud_centro):
     # Conversión del área cubierta por la imagen a kilómetros
